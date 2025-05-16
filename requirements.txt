@@ -1,3 +1,6 @@
 opencv-python
 numpy
 pillow
+
+in terminal
+pip install opencv-python numpy pillow
