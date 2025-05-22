@@ -7,9 +7,11 @@ import threading
 import datetime
 import subprocess
 
-# Setup folder to store blurred videos
+# Setup folders
 OUTPUT_FOLDER = "output_videos"
+PHOTO_OUTPUT_FOLDER = "blurred_photos"
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+os.makedirs(PHOTO_OUTPUT_FOLDER, exist_ok=True)
 
 # Load face cascade
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -33,7 +35,7 @@ def blur_faces_in_image(image_path, output_dir):
 
 def process_photos(photo_paths, progress, status):
     total = len(photo_paths)
-    output_dir = os.path.join(os.getcwd(), "blurred_photos")
+    output_dir = os.path.join(os.getcwd(), PHOTO_OUTPUT_FOLDER)
     os.makedirs(output_dir, exist_ok=True)
 
     for i, path in enumerate(photo_paths, 1):
@@ -132,6 +134,13 @@ def open_video_folder():
     if os.path.exists(path):
         subprocess.Popen(f'explorer "{path}"')
 
+def open_photo_folder():
+    path = os.path.abspath(PHOTO_OUTPUT_FOLDER)
+    if os.path.exists(path):
+        subprocess.Popen(f'explorer "{path}"')
+    else:
+        messagebox.showinfo("Info", "No blurred photos found yet.")
+
 # ---- UI Setup ----
 root = tk.Tk()
 root.title("Face Blur App")
@@ -158,10 +167,18 @@ def choose_video():
 def start_webcam():
     threading.Thread(target=blur_faces_from_webcam, args=(progress, status_var)).start()
 
-tk.Button(root, text="🖼️ Blur Photos", width=25, command=choose_photos).pack(pady=5)
-tk.Button(root, text="🎞️ Blur Video File", width=25, command=choose_video).pack(pady=5)
-tk.Button(root, text="📷 Blur Webcam", width=25, command=start_webcam).pack(pady=5)
-tk.Button(root, text="📂 Open Blurred Videos Folder", width=25, command=open_video_folder).pack(pady=10)
+# Blurring Buttons (top 3)
+tk.Button(root, text="🖼️ Blur Photos", bg="white", width=30, height=1, command=choose_photos).pack(pady=3)
+tk.Button(root, text="🎞️ Blur Video File", bg="white", width=30, height=1, command=choose_video).pack(pady=3)
+tk.Button(root, text="📷 Blur Webcam", bg="white", width=30, height=1, command=start_webcam).pack(pady=3)
+
+# Very small gap between blur and folder section
+tk.Label(root, text="").pack(pady=5)
+
+# Folder Buttons (bottom 2)
+tk.Button(root, text="📂 Open Blurred Photos Folder", bg="white", width=30, height=1, command=open_photo_folder).pack(pady=3)
+tk.Button(root, text="📂 Open Blurred Videos Folder", bg="white", width=30, height=1, command=open_video_folder).pack(pady=3)
+
 
 tk.Label(root, text="Press 'q' to stop webcam or video preview", font=("Arial", 8)).pack(pady=10)
 
